@@ -1,12 +1,12 @@
 import React from "react";
 import Parts from "./Parts";
 
-function Content({ part1, part2, part3 }) {
+function Content({ parts }) {
 	return (
 		<>
-			<Parts part={part1}></Parts>
-			<Parts part={part2}></Parts>
-			<Parts part={part3}></Parts>
+			<Parts part={parts[0]}></Parts>
+			<Parts part={parts[1]}></Parts>
+			<Parts part={parts[2]}></Parts>
 		</>
 	);
 }
