@@ -1,10 +1,10 @@
 import React from "react";
 
-function Parts({part, exercise}) {
+function Parts({ part }) {
 	return (
 		<>
 			<p>
-				{part} {exercise}
+				{part.name} {part.exercises}
 			</p>
 		</>
 	);
