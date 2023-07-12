@@ -1,16 +1,18 @@
 import React from "react";
 
 function Total({ course }) {
-	return (
-		<>
-			<p>
-				Number of exercises{" "}
-				{course.parts[0].exercises +
-					course.parts[1].exercises +
-					course.parts[2].exercises}
-			</p>
-		</>
-	);
+  let total = 0;
+  return (
+    <>
+      <p>
+        {course.parts.forEach((part) => {
+          total += part.exercises;
+        })}
+        Number of exercises{" "}
+		{total}
+      </p>
+    </>
+  );
 }
 
 export default Total;
