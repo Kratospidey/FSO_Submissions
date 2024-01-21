@@ -3,10 +3,15 @@ import Persons from "./components/Persons";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import personService from "./services/persons";
-import axios from "axios";
+import Notification from "./components/Notification";
 
 const App = () => {
 	const [persons, setPersons] = useState([]);
+	const [notifMessage, setNotifMessage] = useState({
+		message: null,
+		messageType: null,
+	});
+	console.log(notifMessage);
 
 	useEffect(() => {
 		personService.getAll().then((initialPersons) => {
@@ -58,6 +63,10 @@ const App = () => {
 				personService
 					.update(personToReplace.id, replacePersonObject)
 					.then((updatedPerson) => {
+						setNotifMessage(`Updated ${updatedPerson.name}`, "success");
+						setTimeout(() => {
+							setNotifMessage({ message: null, messageType: null });
+						}, 5000);
 						setPersons(
 							persons.map((person) =>
 								person.name != newName ? person : updatedPerson
@@ -69,7 +78,13 @@ const App = () => {
 					});
 			}
 		} else if (persons.some((person) => person.name === newName)) {
-			alert(`${newName} is already added to phonebook`);
+			setNotifMessage({
+				message: `${personName} is already added to phonebook`,
+				messageType: "error",
+			});
+			setTimeout(() => {
+				setNotifMessage({ message: null, messageType: null });
+			}, 5000);
 			return;
 		}
 
@@ -78,7 +93,14 @@ const App = () => {
 			number: newNumber,
 		};
 
-		personService.create().then((returnedPerson) => {
+		personService.create(personObject).then((returnedPerson) => {
+			setNotifMessage({
+				message: `Added ${returnedPerson.name}`,
+				messageType: "success",
+			});
+			setTimeout(() => {
+				setNotifMessage(null);
+			}, 5000);
 			setPersons(persons.concat(returnedPerson));
 			setNewName("");
 			setNewNumber("");
@@ -96,16 +118,33 @@ const App = () => {
 		}
 
 		if (window.confirm(`Delete ${personName}?`)) {
-			personService.remove(personToDelete.id, personToDelete).then(() => {
-				setPersons(persons.filter((person) => person.id !== personToDelete.id));
-				// Update the local state to reflect the deletion
-			});
+			personService
+				.remove(personToDelete.id, personToDelete)
+				.then(() => {
+					setPersons(
+						persons.filter((person) => person.id !== personToDelete.id)
+					);
+				})
+				.catch((error) => {
+					setNotifMessage({
+						message: `Information of ${personName} has already been removed from server`,
+						messageType: "error",
+					});
+					setTimeout(() => {
+						setNotifMessage({ message: null, messageType: null });
+					}, 5000);
+					return;
+				});
 		}
 	};
 
 	return (
 		<div>
 			<h2>Phonebook</h2>
+			<Notification
+				message={notifMessage.message}
+				messageType={notifMessage.messageType}
+			></Notification>
 			<Filter filter={filter} handleFilterChange={handleFilterChange}></Filter>
 			<h2>add a new</h2>
 			<PersonForm
